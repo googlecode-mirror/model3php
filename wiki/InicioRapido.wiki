@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Guia de inicio rapido a Model3PHP
 
 = Introducción =
 
@@ -37,4 +37,3 @@ Si todo sale bien tendremo una pagina como la siguiente:
 imagen
 
 Puedes probar con la direccion http://localhost/testModel3/public/Index/ para verificar la configuracion de tu servidor en caso de recibir un 404 algo anda mal con tu Apache/Mod_Rewrite.
-
