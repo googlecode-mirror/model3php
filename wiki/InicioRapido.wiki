@@ -29,6 +29,12 @@ Tambien necesitaremos almacenar nuestra informacion en una base de datos, usarem
 ||book||text|| ||
 ||author||text|| ||
 
+Insertaremos algunos datos en nuestra base para comenzar en la pagina inicial:
+
+{{{
+INSERT INTO `test_model3_db`.`books` (`id`, `book`, `author`) VALUES (NULL, 'Libro1', 'A1'), (NULL, 'Libro2', 'A2');
+}}}
+
 == Comezando la aplicación ==
 Primero que nada vamos a probar que nuestra aplicacion este funcionando correctamente, si todo esta funcionando correctamente vamos a abrir nuestro navegador y escribiremos http://localhost/testModel3/public/ donde localhost es el servidor que estoy usando para probar y testModel3 es la carpeta en la que puse mi proyecto nuevo.
 
@@ -37,3 +43,83 @@ Si todo sale bien tendremo una pagina como la siguiente:
 imagen
 
 Puedes probar con la direccion http://localhost/testModel3/public/Index/ para verificar la configuracion de tu servidor en caso de recibir un 404 algo anda mal con tu Apache/Mod_Rewrite.
+
+=== Preparando nuestro controlador ===
+
+Vamos a empezar preparando nuestro controlador, el proyecto ya cuenta con el IndexController dentro del archivo project/application/Controller/IndexController.php en el vamos a generar las acciones que necesitaremos, para generar una accion debemos generar un metodo con el nombre de la accion seguido de la palabra Action, por ejemplo, para crear el metodo add:
+
+{{{
+    public function addAction()
+    {
+    }
+}}}
+
+De esta forma vamos a crear los metodos add, delete y edit, para la pagina principal usaremos la accion index.
+
+Tambien necesitaremos generar un archivo de vista para cada accion, esto lo haremos en la carpeta project/application/View/Scripts/Index/, ahi generaremos un archivo add.php, delete.php y edit.php y podemos crear un texto de prueba dentro de ellos, solo para probar el funcionamiento, por ejemplo el archivo project/application/View/Scripts/Index/add.php podria contener:
+
+{{{
+<html>
+<head>
+</head>
+<body>
+    Esta es la accion add...
+</body>
+</html>
+}}}
+
+Y las puedes probar con algo como http://localhost/testModel3/public/Index/add/
+
+=== Configurando la base de datos ===
+
+Para configurar nuestra base  de datos vamos a modificar el archivo project/application/Config/config.ini y agregaremos una seccion de base de datos para ello debemos crear un bloque que inicie con db_, algo asi resultaria:
+
+{{{
+[db_default]
+db_host = localhost
+db_user = root
+db_pass = 
+db_name = test_model3_db
+cnx_name = Default
+}}}
+
+Cuando inicias la aplicacion, se revisa todo lo que pones en tu archivo config.ini y se toman diversas acciones a partir de el, por ejemplo, todos los bloques que inician con db_ son tomados como configuraciones de una base de datos.
+
+Ahora es momento de generar las clases de nuestra DB, para ello Doctrine nos ayuda y Model3 te ayuda a que Doctrine te ayude, simplemente escribe en tu navegador http://localhost/testModel3/public/Index/mapDB/ y tendra en la carpeta Model los archivos que Doctrine genera, para este ejemplo genera una carṕeta Default(el nombre de la conexion) y adentro las clases Books y BooksTable.
+
+=== Desplegando los libros ===
+
+Como esta es una aplicacion de ejemplo vamos a comenzar la pagina inicial desplegando los libros en una tabla, no vamos a paginar ni nada por el estilo solo vamos a desplegar todos, para ello vamos a la accion index del IndexController y haremos una consulta de los libros:
+
+{{{
+$booksAdapter = Default_BooksTable::getInstance();
+$books = $booksAdapter->findAll();
+$this->view->books = $books;
+}}}
+
+Despues en el archivo de vista el cual seria project/application/View/Scripts/Index/index.php vamos a generar el codigo de despliegue:
+
+{{{
+<html>
+    <head>
+        <title>Model3</title>
+    </head>
+    <body>
+        <table>
+            <?php
+            foreach ($view->books as $book)
+            {
+                echo '<tr>';
+                echo '<td>';
+                echo $book->book;
+                echo '</td>';
+                echo '<td>';
+                echo $book->author;
+                echo '</td>';
+                echo '</tr>';
+            }
+            ?>
+        </table>
+    </body>
+</html>
+}}}
