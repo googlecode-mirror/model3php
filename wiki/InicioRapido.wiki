@@ -235,6 +235,30 @@ public function editAction()
     }
 }}}
 
+la vista tendria algo asi:
+
+<html>
+<head>
+</head>
+<body>
+    <h1>Editar libro</h1>
+    <a href="<?php echo $view->url(array('controller' => 'Index', 'action' => 'index')); ?>">Volver a index</a><br/><br/>
+    <?php
+    if($view->message)
+    {
+        echo $view->message.'<br/>';
+    }
+    ?>
+    <form action="<?php echo $view->url(array('controller' => 'Index', 'action' => 'edit'), true); ?>" method="post">
+        Libro:<br/>
+        <input type="text" name="txtBook" value="<?php echo $view->book->book; ?>" /><br/>
+        Autor:<br/>
+        <input type="text" name="txtAuthor" value="<?php echo $view->book->author; ?>" /><br/>
+        <input type="submit" value="Guardar" />
+    </form>
+</body>
+</html>
+
 == Gracias ==
 
 Gracias por su interes en Model3PHP, existen muchas cosas que no se tocaron en este pequeño tutorial pero que trataremos en otros, de hecho esta aplicacion sera la base para otros temas que despues veremos, saludos...
