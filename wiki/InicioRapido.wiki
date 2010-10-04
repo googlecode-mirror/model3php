@@ -237,6 +237,7 @@ public function editAction()
 
 la vista tendria algo asi:
 
+{{{
 <html>
 <head>
 </head>
@@ -258,6 +259,7 @@ la vista tendria algo asi:
     </form>
 </body>
 </html>
+}}}
 
 == Gracias ==
 
