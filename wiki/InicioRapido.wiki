@@ -1,6 +1,6 @@
 #summary Guia de inicio rapido a Model3PHP
 
-= Introducción =
+= Model3PHP: Inicio Rapido =
 
 Esta es una guia de inicio rapido a Model3PHP<br/>
 Hector Benitez 2010
@@ -105,8 +105,10 @@ Despues en el archivo de vista el cual seria project/application/View/Scripts/In
         <title>Model3</title>
     </head>
     <body>
+        <h1>Mis ebooks</h1>
+        <a href="<?php echo $view->url(array('controller' => 'Index', 'action' => 'add')); ?>">Agregar un nuevo libro</a><br/><br/>
         <table>
-            <?php
+            <?php            
             foreach ($view->books as $book)
             {
                 echo '<tr>';
@@ -115,6 +117,12 @@ Despues en el archivo de vista el cual seria project/application/View/Scripts/In
                 echo '</td>';
                 echo '<td>';
                 echo $book->author;
+                echo '</td>';                
+                echo '<td>';
+                echo '<a href="'.$view->url(array('controller' => 'Index', 'action' => 'edit', 'book' => $book->id)).'">Editar</a>';
+                echo '</td>';
+                echo '<td>';
+                echo '<a href="'.$view->url(array('controller' => 'Index', 'action' => 'delete', 'book' => $book->id)).'">Eliminar</a>';
                 echo '</td>';
                 echo '</tr>';
             }
@@ -123,3 +131,110 @@ Despues en el archivo de vista el cual seria project/application/View/Scripts/In
     </body>
 </html>
 }}}
+
+Esto genera una tabla con los libros y sus autores, pero ademas en cada registro pondra 2 links extra, uno para editar y otro para eliminar, estos links estaran direccionando a sus respectivas acciones pero ademas llevaran como parametro el id del libro, un ejemplo seria esta url:
+
+{{{
+http://localhost/TestModel3/public/Index/edit/book/1/
+}}}
+
+Ademas se agregara una liga a la accion add la cual se usara para agregar libros...
+
+=== Agregando nuevos libros ===
+
+Muy bien ahora vamos a agregar nuevos libros a nuestra aplicación, para esto vamos a editar el archivo project/application/View/Scripts/Index/add.php y agregaremos a el un formulario con 2 campos, uno para el nombre y otro para el autor y un boton submit, algo asi quedaria:
+
+{{{
+<html>
+<head>
+</head>
+<body>
+    <h1>Agregar un nuevo libro</h1>
+    <a href="<?php echo $view->url(array('controller' => 'Index', 'action' => 'index')); ?>">Volver a index</a><br/><br/>
+    <?php
+    if($view->message)
+    {
+        echo $view->message.'<br/>';
+    }
+    ?>
+    <form action="<?php echo $view->url(array('controller' => 'Index', 'action' => 'add')); ?>" method="post">
+        Libro:<br/>
+        <input type="text" name="txtBook" /><br/>
+        Autor:<br/>
+        <input type="text" name="txtAuthor" /><br/>
+        <input type="submit" value="Guardar" />
+    </form>
+</body>
+</html>
+}}}
+
+Ahora modificaremos en el controlador la accion add para agregar un nuevo libro con los datos enviados por POST:
+
+{{{
+public function addAction()
+    {
+        if ($this->getRequest()->isPost())
+        {
+            $post = $this->getRequest()->getPost();
+            $book = new Default_Books();
+            $book->book = $post['txtBook'];
+            $book->author = $post['txtAuthor'];
+            $book->save();
+
+            $this->view->message = 'Libro guardado exitosamente';
+        }
+    }
+}}}
+
+=== Eliminando libros ===
+
+Para la funcionalidad de eliminar libros existe un punto nuevo que se debe tener en cuanta, viene con parametro, en este caso tendremos que utilizar este parametro para saber que libro debe ser eliminado, por el momento nos saltaremos la confirmacion de borrado de datos y simplemente eliminaremos el libro y haremos un redirect a la pagina principal, ignoraremos la vista en este momento:
+
+{{{
+public function deleteAction()
+    {
+        $idBook = $this->getRequest()->getParam('book');
+        if ($idBook)
+        {
+            $booksAdapter = Default_BooksTable::getInstance();
+            $book = $booksAdapter->find($idBook);
+            if ($book)
+            {
+                $book->delete();
+            }
+        }
+        $this->redirect();
+    }
+}}}
+
+=== Editando libros ===
+Finalmente para agregar la edición de libros crearemos una vista con formulario igual que la de la accion add, pero usaremos el parametro para leer el libro y actualizarlo despues, el codigo de la accion seria asi:
+
+{{{
+public function editAction()
+    {
+        $idBook = $this->getRequest()->getParam('book');
+        if ($idBook)
+        {
+            $booksAdapter = Default_BooksTable::getInstance();
+            $book = $booksAdapter->find($idBook);
+            if ($book)
+            {
+                if ($this->getRequest()->isPost())
+                {
+                    $post = $this->getRequest()->getPost();
+                    $book->book = $post['txtBook'];
+                    $book->author = $post['txtAuthor'];
+                    $book->save();
+
+                    $this->view->message = 'Libro editado exitosamente';
+                }
+                $this->view->book = $book;
+            }
+        }
+    }
+}}}
+
+== Gracias ==
+
+Gracias por su interes en Model3PHP, existen muchas cosas que no se tocaron en este pequeño tutorial pero que trataremos en otros, de hecho esta aplicacion sera la base para otros temas que despues veremos, saludos...
