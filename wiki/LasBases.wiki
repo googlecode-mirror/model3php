@@ -38,11 +38,11 @@ Model3 usa el patron MVC para dividir la aplicacion, de este modo es que tendrem
 
 Se recomienda que para las clases que controlan tablas en la base de datos se genere una clase por tabla.
 
-Ahora la logica de control se maneja a traves de los Controladores estos a su vez se comoponen de Acciones y para cada Accion se tendra una Vista relacionada, los Controlodares pueden agrupar varias acciones relacionadas por ejemplo, podriamos tener un Controlador "Users" que tenga las Acciones "list", "add" y "delete" cada una de esta Acciones a sus vez estaria relacionada con una Vista la cual ayudaria a desplegar la info necesaria por ejemplo la Vista "list" podria tener una tabla listando todos los usuarios de la aplicacion y la Vista "add" podria tener un formulario para incluir los datos del usuario.
+Ahora la logica de control se maneja a traves de los Controladores estos a su vez se componen de Acciones y para cada Accion se tendra una Vista relacionada, los Controlodares pueden agrupar varias acciones relacionadas por ejemplo, podriamos tener un Controlador "Users" que tenga las Acciones "list", "add" y "delete" cada una de esta Acciones a sus vez estaria relacionada con una Vista la cual ayudaria a desplegar la info necesaria por ejemplo la Vista "list" podria tener una tabla listando todos los usuarios de la aplicacion y la Vista "add" podria tener un formulario para incluir los datos del usuario.
 
-Los Controladores se encontraran en la carpeta Controller y el archivo se llamara NombreController.php (iniciando con mayuscula, usando UpperCamelCase) cada archivo tendra una clase llamada NombreController la cual hereda de Model3_Controller. Cada accion sera un metodo de dicha clase y se nombrara nombreAction (iniciando con minuscula, usando lowerCamelCase).
+Los Controladores se encontraran en la carpeta Controller y el archivo se llamara !NombreController.php (iniciando con mayuscula, usando !UpperCamelCase) cada archivo tendra una clase llamada !NombreController la cual hereda de !Model3_Controller. Cada accion sera un metodo de dicha clase y se nombrara nombreAction (iniciando con minuscula, usando lowerCamelCase).
 
-Las Vistas se encontraran dentro de la carpeta View/Scripts/ y ahi dentro existira una carpeta con el nombre del Controlador y dentro de ella archiovos php con los nombres de las acciones (sin la palabra Action).
+Las Vistas se encontraran dentro de la carpeta View/Scripts/ y ahi dentro existira una carpeta con el nombre del Controlador y dentro de ella archivos php con los nombres de las acciones (sin la palabra Action).
 
 Las aplicaciones usan la URL para identificar que controlador y accion se esta usando, ademas de los parametros, y usa la siguiente estructura:
 
@@ -52,7 +52,7 @@ http://dominio/NombreControlador/nombreAccion/nombreParametro1/valorParametro1/n
 
 ==== Ligando informacion entre la accion y la vista ====
 
-Cuando llegamos a una Accion dentro de nuestro sistema esta debe hacer lo necesario para responder al usuario, para ello la accion puede instanciar y usar cualquier Modelo, la informacion resultante se debe pasar a la propiedad "view" de la clase Model3_Controller y se podra usar desde la vista con la variable $view, por ejemplo en la accion se podria escribir 
+Cuando llegamos a una Accion dentro de nuestro sistema esta debe hacer lo necesario para responder al usuario, para ello la accion puede instanciar y usar cualquier Modelo, la informacion resultante se debe pasar a la propiedad "view" de la clase !Model3_Controller y se podra usar desde la vista con la variable $view, por ejemplo en la accion se podria escribir 
 
 {{{
 $this->view->resultado = 'Hola Mundo';
@@ -68,7 +68,7 @@ Imprimiria un 'Hola Mundo'.
 
 ==== Formando ligas ====
 
-Para formar links a otras paginas de nuestro mismo sitio web se usara la funcion url de la clase Model3_View la cual recibe un arreglo asociativo el cual podra especificar el elemento "controller" y el elemento "action", cualquier otro elemento sera usado como parametro, por ejemplo si en una vista escribimos 
+Para formar links a otras paginas de nuestro mismo sitio web se usara la funcion url de la clase !Model3_View la cual recibe un arreglo asociativo el cual podra especificar el elemento "controller" y el elemento "action", cualquier otro elemento sera usado como parametro, por ejemplo si en una vista escribimos 
 
 {{{
 $view->url(array('controller'=>'Admin', 'action'=>'settings', 'par1'=>'val1'));
@@ -76,9 +76,9 @@ $view->url(array('controller'=>'Admin', 'action'=>'settings', 'par1'=>'val1'));
 
 Formara la url http://dominio/Admin/settings/par1/val1
 
-==== BaseUrl ====
+==== !BaseUrl ====
 
-Al usar elementos como imagenes, archivos js o css, es importante usar siempre la funcion baseUrl() de la clase Model3_View y despues tomar en cuenta todo desde la carpeta public por ejemplo: 
+Al usar elementos como imagenes, archivos js o css, es importante usar siempre la funcion baseUrl() de la clase !Model3_View y despues tomar en cuenta todo desde la carpeta public por ejemplo: 
 
 {{{
 <img src="<?php echo $view->url('/images/imgPrueba.jpg') ?>" />
