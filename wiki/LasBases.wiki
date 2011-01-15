@@ -1,6 +1,6 @@
-#summary Lo basico sobre el framework Model3PHP
+#summary 1.Lo basico sobre el framework Model3PHP
 
-= Las Bases =
+= 1.Las Bases =
 Este es el primer documento que debes leer, con esto tendras una breve introduccion en general a los frameworks MVC para PHP y en particular a Model3PHP, de hecho yo creo que este documento podria servir a usuarios que estan aprendiendo otros frameworks MVC, el uso no es igual en todos pero muchos conceptos son identicos.
 
 == Frameworks ==
