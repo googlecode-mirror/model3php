@@ -1,6 +1,6 @@
-#summary Guia de inicio rapido a Model3PHP
+#summary 2.Guia de inicio rapido a Model3PHP
 
-= Model3PHP: Inicio Rapido =
+= Model3PHP: 2.Inicio Rapido =
 
 Esta es una guia de inicio rapido a Model3PHP<br/>
 Hector Benitez 2010
