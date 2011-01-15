@@ -1,0 +1,52 @@
+#summary Agregando Layouts, CSS y JS a un proyecto Model3
+#labels Phase-Design,Phase-Implementation
+
+= Model3PHP: Agregando Estilo =
+
+Bueno, pues continuando con el tutorial de Inicio Rapido en esta ocasion vamos a tratar de darle un poco mas de estilo a nuestra aplicacion, vamos a agregar un toque mas profesional mediante el uso de un Framework CSS que en este caso sera Blueprint CSS, aunque pueden elegir el que gusten y vamos a agregar un poco de JS mediante el conocido JQuery y ademas vamos a ver un poco del uso de los layouts para evitar repetir codigo, asi que manos a la obra.
+
+== Entendiendo el concepto ==
+
+Antes de comenzar tenemos que entender un poco como esta planeado el usar layouts, CSS y JS en Model3PHP, con los layouts el objetivo es tratar de generar una especie de plantilla la cual sea general al sitio o a cierta seccion del sitio y en los archivos de vista solo manejar la parte especifica de la accion que estemos trabajando, por ejemplo el layout puede contener el doctype, los tags html, head y body y en los archivos de vista solo tendriamos lo que esta contenido en el body, dentro de un archivo de layout usaremos la variable especial $layoutdata para indicar donde se incrustara la salida generada por los archivos de vista.
+
+Respecto a los archivos JS y CSS existen dos clases que ayudan a su uso Model3_JsManager y Model3_CssManager estas 2 clases funcionan de una forma muy similar y basicamente tienen 2 formas de uso.
+
+La primera es usar directamente los metodos Model3_CssManager::loadCssFile y Model3_JsManager::loadJsFile los cuales segun los parametros imprimen directamente el codigo necesario para incluir archivos, estos metodos se deben llamar solo dentro de layouts o archivos de vista.
+
+La segunda forma es usar los metodos Model3_CssManager::addCss y Model3_JsManager::addJs para agregar los archivos y despues usar Model3_CssManager::loadCss y Model3_JsManager::loadJs para imprimirlos, los primeros metodos se pueden usar desde actions o action helpers y los segundo solo en layouts o archivos de vista.
+
+La recomendacion de uso esta en usar el primer metodo en layouts y solo para archivos que siempre se incluyen (de la otra forma existirian archivos que siempre tendrias que agregar), el segundo metodo seria para agregar archivos especificos de cierta vista, de este modo siempre se cargaran solo los archivos necesarios.
+
+== Configuración basica de CSS y JS ==
+
+Lo primero que debemos hacer es definir las rutas donde se buscaran los archivos css y js, esto no quiere decir que no puedes agregar css o js desde otras rutas pero la mayoria de los proyectos reunen en algun lado sus css y en otro sus js, esta configuracion solo daria algo como default pero no obligatorio:
+
+Agregaremos estas lineas a nuestro archivo config:
+
+{{{
+[m3_public_settings]
+css_dir = /styles/css/
+js_dir = /scripts/js/
+}}}
+
+Las rutas son relativas a la carpeta publica del proyecto. Con estas rutas yo estoy diciendo donde guardare mis archivos y es por gusto personal la eleccion que tome, algon de ustedes podria usar una carpeta /css u otra /javascript.
+
+== Obteniendo los archivos ==
+
+Bueno pues ahora solo queda descragar los archivos que necesitamos incluir en nuestro proyecto, al momento de este tutorial tenemos Blueprint CSS 1.0 y JQuery 1.4.4, vamos a descargarlas y pondremos los archivos en las carpetas especificadas en el punto anterior, por ejemplo en mi caso lo puse de esta forma:
+
+JQuery
+{{{
+/scripts/js/jquery/jquery-1.4.4.min.js
+}}}
+
+Blueprint
+{{{
+/styles/css/blueprint/ie.css
+/styles/css/blueprint/print.css
+/styles/css/blueprint/screen.css
+}}}
+
+== Integrando ==
+
+Vamos a empezar por Blueprint y por nuestra pagina de inicio, como lo explicamos arriba, usaremos el metodo de impresion directa porque esperamos que Blueprint se encuentre dentro de todo nuestro sitio, modificaremos el archivo application/View/Scripts/Index/index.php
