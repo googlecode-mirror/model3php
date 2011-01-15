@@ -1,4 +1,4 @@
-#summary Agregando Layouts, CSS y JS a un proyecto Model3
+#summary 3.Agregando Layouts, CSS y JS a un proyecto Model3
 #labels Phase-Design,Phase-Implementation
 
 = Model3PHP: 3.Agregando Estilo =
