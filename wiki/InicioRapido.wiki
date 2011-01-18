@@ -22,7 +22,7 @@ Vamos a crear una aplicación que nos permita administrar un listado de ebooks, 
 ||Editar Libro||Esta pagina permitira editar libros||
 ||Borrar Libro||Esta pagina permitira borrar libros||
 
-Tambien necesitaremos almacenar nuestra informacion en una base de datos, usaremos una sola tabla llamada books con lo siguiente:
+Tambien necesitaremos almacenar nuestra informacion en una base de datos la cual llamaremos model3, usaremos una sola tabla llamada books con lo siguiente:
 
 ||Campo||Tipo||Notas||
 ||id||int||Primary key, auto increment||
@@ -40,7 +40,7 @@ CREATE TABLE `model3`.`books` (
 Insertaremos algunos datos en nuestra base para comenzar en la pagina inicial:
 
 {{{
-INSERT INTO `test_model3_db`.`books` (`id`, `book`, `author`) VALUES (NULL, 'Libro1', 'A1'), (NULL, 'Libro2', 'A2');
+INSERT INTO `model3`.`books` (`id`, `book`, `author`) VALUES (NULL, 'Libro1', 'A1'), (NULL, 'Libro2', 'A2');
 }}}
 
 == Comezando la aplicación ==
