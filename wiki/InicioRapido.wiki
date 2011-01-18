@@ -29,6 +29,14 @@ Tambien necesitaremos almacenar nuestra informacion en una base de datos, usarem
 ||book||text|| ||
 ||author||text|| ||
 
+{{{
+CREATE TABLE `model3`.`books` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`book` TEXT NOT NULL ,
+`author` TEXT NOT NULL
+)
+}}}
+
 Insertaremos algunos datos en nuestra base para comenzar en la pagina inicial:
 
 {{{
