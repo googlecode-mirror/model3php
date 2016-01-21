@@ -1,0 +1,40 @@
+# Introduction #
+
+El archivo Config es una parte muy importante de tu aplicación debido a que aqui tendras que configurar muchas variantes de tu aplicacion
+
+Ejemplo de un archivo Config
+```
+[general]
+app_name = ElNombreDeTuApp
+debug = TRUE
+error_controller = Error
+error_action = index
+layout = Template
+
+[m3_internationalization]
+inter_multilang = TRUE
+inter_default_lang = es
+inter_dir_lang = ../application/Languages/
+
+[m3_public_settings]
+css_dir = /css/
+js_dir = /scripts/js/
+
+[m3_general_db]
+engine = Doctrine2
+base_dir = ../application/Model/
+
+[db_default]
+db_host = localhost
+db_user = user
+db_pass = pass
+db_name = database
+cnx_name = DefaultDb
+
+[user_data]
+table = DefaultDb_Entities_User
+id = id
+user = username
+pass = password
+cnx = DefaultDb
+```

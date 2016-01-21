@@ -1,0 +1,274 @@
+# Model3PHP: 2.Inicio Rapido #
+
+Esta es una guia de inicio rapido a Model3PHP<br />
+Hector Benitez 2010
+
+## Requisitos ##
+  * PHP 5.2 o superior
+  * Un servidor web Apache 2.x con mod\_rewrite
+
+Nota: Asegurate de que tu servidor Apache este configurado para usar archivos .htaccess, usualmente basta con modificar el archivo httpd.conf y cambiar la propiedad AllowOverride None por AllowOverride All
+
+  * Descargar la ultima version del framework Model3PHP, este paquete ya incluye una configuración inicial lista para trabajar
+  * Descargate la version de Doctrine ORM 1.2
+
+## Aplicacion de ejemplo ##
+Vamos a crear una aplicación que nos permita administrar un listado de ebooks, esta aplicacion contendra 4 pequeñas secciones:
+
+|Home - Inicio|Esta sera la pagina principal y mostrara una lista con los ebooks que ya hemos dado de alta, desde esta lista podras eliminar y editar, ademas tendra un link para agregar nuevos|
+|:------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|Agregar Libro|Esta pagina permitira agregar libros                                                                                                                                             |
+|Editar Libro |Esta pagina permitira editar libros                                                                                                                                              |
+|Borrar Libro |Esta pagina permitira borrar libros                                                                                                                                              |
+
+Tambien necesitaremos almacenar nuestra informacion en una base de datos la cual llamaremos model3, usaremos una sola tabla llamada books con lo siguiente:
+
+|Campo|Tipo|Notas|
+|:----|:---|:----|
+|id   |int |Primary key, auto increment|
+|book |text|     |
+|author|text|     |
+
+```
+CREATE TABLE `model3`.`books` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`book` TEXT NOT NULL ,
+`author` TEXT NOT NULL
+)
+```
+
+Insertaremos algunos datos en nuestra base para comenzar en la pagina inicial:
+
+```
+INSERT INTO `model3`.`books` (`id`, `book`, `author`) VALUES (NULL, 'Libro1', 'A1'), (NULL, 'Libro2', 'A2');
+```
+
+## Comezando la aplicación ##
+Primero que nada vamos a probar que nuestra aplicacion este funcionando correctamente, si todo esta funcionando correctamente vamos a abrir nuestro navegador y escribiremos http://localhost/testModel3/public/ donde localhost es el servidor que estoy usando para probar y testModel3 es la carpeta en la que puse mi proyecto nuevo.
+
+Si todo sale bien tendremo una pagina como la siguiente:
+
+imagen
+
+Puedes probar con la direccion http://localhost/testModel3/public/Index/ para verificar la configuracion de tu servidor en caso de recibir un 404 algo anda mal con tu Apache/Mod\_Rewrite.
+
+### Preparando nuestro controlador ###
+
+Vamos a empezar preparando nuestro controlador, el proyecto ya cuenta con el IndexController dentro del archivo project/application/Controller/IndexController.php en el vamos a generar las acciones que necesitaremos, para generar una accion debemos generar un metodo con el nombre de la accion seguido de la palabra Action, por ejemplo, para crear el metodo add:
+
+```
+    public function addAction()
+    {
+    }
+```
+
+De esta forma vamos a crear los metodos add, delete y edit, para la pagina principal usaremos la accion index.
+
+Tambien necesitaremos generar un archivo de vista para cada accion, esto lo haremos en la carpeta project/application/View/Scripts/Index/, ahi generaremos un archivo add.php, delete.php y edit.php y podemos crear un texto de prueba dentro de ellos, solo para probar el funcionamiento, por ejemplo el archivo project/application/View/Scripts/Index/add.php podria contener:
+
+```
+<html>
+<head>
+</head>
+<body>
+    Esta es la accion add...
+</body>
+</html>
+```
+
+Y las puedes probar con algo como http://localhost/testModel3/public/Index/add/
+
+### Configurando la base de datos ###
+
+Para configurar nuestra base  de datos vamos a modificar el archivo project/application/Config/config.ini y agregaremos una seccion de base de datos para ello debemos crear un bloque que inicie con db_, algo asi resultaria:_
+
+```
+[db_default]
+db_host = localhost
+db_user = root
+db_pass = 
+db_name = test_model3_db
+cnx_name = Default
+```
+
+Cuando inicias la aplicacion, se revisa todo lo que pones en tu archivo config.ini y se toman diversas acciones a partir de el, por ejemplo, todos los bloques que inician con db_son tomados como configuraciones de una base de datos._
+
+Ahora es momento de generar las clases de nuestra DB, para ello Doctrine nos ayuda y Model3 te ayuda a que Doctrine te ayude, simplemente escribe en tu navegador http://localhost/testModel3/public/Index/mapDB/ y tendra en la carpeta Model los archivos que Doctrine genera, para este ejemplo genera una carṕeta Default(el nombre de la conexion) y adentro las clases Books y BooksTable.
+
+### Desplegando los libros ###
+
+Como esta es una aplicacion de ejemplo vamos a comenzar la pagina inicial desplegando los libros en una tabla, no vamos a paginar ni nada por el estilo solo vamos a desplegar todos, para ello vamos a la accion index del IndexController y haremos una consulta de los libros:
+
+```
+$booksAdapter = Default_BooksTable::getInstance();
+$books = $booksAdapter->findAll();
+$this->view->books = $books;
+```
+
+Despues en el archivo de vista el cual seria project/application/View/Scripts/Index/index.php vamos a generar el codigo de despliegue:
+
+```
+<html>
+    <head>
+        <title>Model3</title>
+    </head>
+    <body>
+        <h1>Mis ebooks</h1>
+        <a href="<?php echo $view->url(array('controller' => 'Index', 'action' => 'add')); ?>">Agregar un nuevo libro</a><br/><br/>
+        <table>
+            <?php            
+            foreach ($view->books as $book)
+            {
+                echo '<tr>';
+                echo '<td>';
+                echo $book->book;
+                echo '</td>';
+                echo '<td>';
+                echo $book->author;
+                echo '</td>';                
+                echo '<td>';
+                echo '<a href="'.$view->url(array('controller' => 'Index', 'action' => 'edit', 'book' => $book->id)).'">Editar</a>';
+                echo '</td>';
+                echo '<td>';
+                echo '<a href="'.$view->url(array('controller' => 'Index', 'action' => 'delete', 'book' => $book->id)).'">Eliminar</a>';
+                echo '</td>';
+                echo '</tr>';
+            }
+            ?>
+        </table>
+    </body>
+</html>
+```
+
+Esto genera una tabla con los libros y sus autores, pero ademas en cada registro pondra 2 links extra, uno para editar y otro para eliminar, estos links estaran direccionando a sus respectivas acciones pero ademas llevaran como parametro el id del libro, un ejemplo seria esta url:
+
+```
+http://localhost/TestModel3/public/Index/edit/book/1/
+```
+
+Ademas se agregara una liga a la accion add la cual se usara para agregar libros...
+
+### Agregando nuevos libros ###
+
+Muy bien ahora vamos a agregar nuevos libros a nuestra aplicación, para esto vamos a editar el archivo project/application/View/Scripts/Index/add.php y agregaremos a el un formulario con 2 campos, uno para el nombre y otro para el autor y un boton submit, algo asi quedaria:
+
+```
+<html>
+<head>
+</head>
+<body>
+    <h1>Agregar un nuevo libro</h1>
+    <a href="<?php echo $view->url(array('controller' => 'Index', 'action' => 'index')); ?>">Volver a index</a><br/><br/>
+    <?php
+    if($view->message)
+    {
+        echo $view->message.'<br/>';
+    }
+    ?>
+    <form action="<?php echo $view->url(array('controller' => 'Index', 'action' => 'add')); ?>" method="post">
+        Libro:<br/>
+        <input type="text" name="txtBook" /><br/>
+        Autor:<br/>
+        <input type="text" name="txtAuthor" /><br/>
+        <input type="submit" value="Guardar" />
+    </form>
+</body>
+</html>
+```
+
+Ahora modificaremos en el controlador la accion add para agregar un nuevo libro con los datos enviados por POST:
+
+```
+public function addAction()
+    {
+        if ($this->getRequest()->isPost())
+        {
+            $post = $this->getRequest()->getPost();
+            $book = new Default_Books();
+            $book->book = $post['txtBook'];
+            $book->author = $post['txtAuthor'];
+            $book->save();
+
+            $this->view->message = 'Libro guardado exitosamente';
+        }
+    }
+```
+
+### Eliminando libros ###
+
+Para la funcionalidad de eliminar libros existe un punto nuevo que se debe tener en cuanta, viene con parametro, en este caso tendremos que utilizar este parametro para saber que libro debe ser eliminado, por el momento nos saltaremos la confirmacion de borrado de datos y simplemente eliminaremos el libro y haremos un redirect a la pagina principal, ignoraremos la vista en este momento:
+
+```
+public function deleteAction()
+    {
+        $idBook = $this->getRequest()->getParam('book');
+        if ($idBook)
+        {
+            $booksAdapter = Default_BooksTable::getInstance();
+            $book = $booksAdapter->find($idBook);
+            if ($book)
+            {
+                $book->delete();
+            }
+        }
+        $this->redirect();
+    }
+```
+
+### Editando libros ###
+Finalmente para agregar la edición de libros crearemos una vista con formulario igual que la de la accion add, pero usaremos el parametro para leer el libro y actualizarlo despues, el codigo de la accion seria asi:
+
+```
+public function editAction()
+    {
+        $idBook = $this->getRequest()->getParam('book');
+        if ($idBook)
+        {
+            $booksAdapter = Default_BooksTable::getInstance();
+            $book = $booksAdapter->find($idBook);
+            if ($book)
+            {
+                if ($this->getRequest()->isPost())
+                {
+                    $post = $this->getRequest()->getPost();
+                    $book->book = $post['txtBook'];
+                    $book->author = $post['txtAuthor'];
+                    $book->save();
+
+                    $this->view->message = 'Libro editado exitosamente';
+                }
+                $this->view->book = $book;
+            }
+        }
+    }
+```
+
+la vista tendria algo asi:
+
+```
+<html>
+<head>
+</head>
+<body>
+    <h1>Editar libro</h1>
+    <a href="<?php echo $view->url(array('controller' => 'Index', 'action' => 'index')); ?>">Volver a index</a><br/><br/>
+    <?php
+    if($view->message)
+    {
+        echo $view->message.'<br/>';
+    }
+    ?>
+    <form action="<?php echo $view->url(array('controller' => 'Index', 'action' => 'edit'), true); ?>" method="post">
+        Libro:<br/>
+        <input type="text" name="txtBook" value="<?php echo $view->book->book; ?>" /><br/>
+        Autor:<br/>
+        <input type="text" name="txtAuthor" value="<?php echo $view->book->author; ?>" /><br/>
+        <input type="submit" value="Guardar" />
+    </form>
+</body>
+</html>
+```
+
+## Gracias ##
+
+Gracias por su interes en Model3PHP, existen muchas cosas que no se tocaron en este pequeño tutorial pero que trataremos en otros, de hecho esta aplicacion sera la base para otros temas que despues veremos, saludos...

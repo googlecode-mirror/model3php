@@ -1,0 +1,235 @@
+# Model3PHP: 3.Agregando Estilo #
+
+Bueno, pues continuando con el tutorial de Inicio Rapido en esta ocasion vamos a tratar de darle un poco mas de estilo a nuestra aplicacion, vamos a agregar un toque mas profesional mediante el uso de un Framework CSS que en este caso sera Blueprint CSS, aunque pueden elegir el que gusten y vamos a agregar un poco de JS mediante el conocido JQuery y ademas vamos a ver un poco del uso de los layouts para evitar repetir codigo, asi que manos a la obra.
+
+## Entendiendo el concepto ##
+
+Antes de comenzar tenemos que entender un poco como esta planeado el usar layouts, CSS y JS en Model3PHP, con los layouts el objetivo es tratar de generar una especie de plantilla la cual sea general al sitio o a cierta seccion del sitio y en los archivos de vista solo manejar la parte especifica de la accion que estemos trabajando, por ejemplo el layout puede contener el doctype, los tags html, head y body y en los archivos de vista solo tendriamos lo que esta contenido en el body, dentro de un archivo de layout usaremos la variable especial $layoutdata para indicar donde se incrustara la salida generada por los archivos de vista.
+
+Respecto a los archivos JS y CSS existen dos clases que ayudan a su uso Model3\_JsManager y Model3\_CssManager estas 2 clases funcionan de una forma muy similar y basicamente tienen 2 formas de uso.
+
+La primera es usar directamente los metodos Model3\_CssManager::loadCssFile y Model3\_JsManager::loadJsFile los cuales segun los parametros imprimen directamente el codigo necesario para incluir archivos, estos metodos se deben llamar solo dentro de layouts o archivos de vista.
+
+La segunda forma es usar los metodos Model3\_CssManager::addCss y Model3\_JsManager::addJs para agregar los archivos y despues usar Model3\_CssManager::loadCss y Model3\_JsManager::loadJs para imprimirlos, los primeros metodos se pueden usar desde actions o action helpers y los segundo solo en layouts o archivos de vista.
+
+La recomendacion de uso esta en usar el primer metodo en layouts y solo para archivos que siempre se incluyen (de la otra forma existirian archivos que siempre tendrias que agregar), el segundo metodo seria para agregar archivos especificos de cierta vista, de este modo siempre se cargaran solo los archivos necesarios.
+
+## Configuración basica de CSS y JS ##
+
+Lo primero que debemos hacer es definir las rutas donde se buscaran los archivos css y js, esto no quiere decir que no puedes agregar css o js desde otras rutas pero la mayoria de los proyectos reunen en algun lado sus css y en otro sus js, esta configuracion solo daria algo como default pero no obligatorio:
+
+Agregaremos estas lineas a nuestro archivo config:
+
+```
+[m3_public_settings]
+css_dir = /styles/css/
+js_dir = /scripts/js/
+```
+
+Las rutas son relativas a la carpeta publica del proyecto. Con estas rutas yo estoy diciendo donde guardare mis archivos y es por gusto personal la eleccion que tome, algon de ustedes podria usar una carpeta /css u otra /javascript.
+
+## Obteniendo los archivos ##
+
+Bueno pues ahora solo queda descragar los archivos que necesitamos incluir en nuestro proyecto, al momento de este tutorial tenemos Blueprint CSS 1.0 y JQuery 1.4.4, vamos a descargarlas y pondremos los archivos en las carpetas especificadas en el punto anterior, por ejemplo en mi caso lo puse de esta forma:
+
+JQuery
+```
+/scripts/js/jquery/jquery-1.4.4.min.js
+```
+
+Blueprint
+```
+/styles/css/blueprint/ie.css
+/styles/css/blueprint/print.css
+/styles/css/blueprint/screen.css
+```
+
+## Integrando ##
+
+Vamos a empezar por Blueprint y por nuestra pagina de inicio, como lo explicamos arriba, usaremos el metodo de impresion directa porque esperamos que Blueprint se encuentre dentro de todo nuestro sitio, modificaremos el archivo application/View/Scripts/Index/index.php
+
+```
+<?php /* @var $view Model3_View */ ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es-ES">
+    <head>
+        <title>Model3</title>
+        <?php
+        $view->getCssManager()->loadCssFile('blueprint/screen.css', 'screen, projection');
+        $view->getCssManager()->loadCssFile('blueprint/print.css', 'print');
+        $view->getCssManager()->loadCssFile('blueprint/ie.css', 'screen', false, 'lt IE 8');
+        ?>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Mis ebooks</h1>
+            <a href="<?php echo $view->url(array('controller' => 'Index', 'action' => 'add')); ?>">Agregar un nuevo libro</a><br/><br/>
+            <table>
+                <tr>
+                    <th>Libro</th>
+                    <th>Autor</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+                <?php
+                foreach ($view->books as $book)
+                {
+                    echo '<tr>';
+                    echo '<td>';
+                    echo $book->book;
+                    echo '</td>';
+                    echo '<td>';
+                    echo $book->author;
+                    echo '</td>';
+                    echo '<td>';
+                    echo '<a href="' . $view->url(array('controller' => 'Index', 'action' => 'edit', 'book' => $book->id)) . '">Editar</a>';
+                    echo '</td>';
+                    echo '<td>';
+                    echo '<a href="' . $view->url(array('controller' => 'Index', 'action' => 'delete', 'book' => $book->id)) . '">Eliminar</a>';
+                    echo '</td>';
+                    echo '</tr>';
+                }
+                ?>
+            </table>
+        </div>
+    </body>
+</html>
+```
+
+Explicando un poco, la primera linea la usamos los que programamos en Netbeans para indicarle al IDE que la variable $view es de tipo Model3\_View, esto se puede ahcer en cualquier caso y es muy util tambien con otros frameworks. Despues ya mejoramos un poco nuestra estructura html(pero esta guia no es de html, asi que no me metere mucho en detalles), en la seccion head incluimos ahora un bloque PHP que permite incluir el blueprint, y en la seccion body incluimos lo que ya teniamos dentro de un div con class "container"(Esto es parte del uso de blueprint), con esto ya podemos probar nuestra aplicación y veremos ya un cambio en el diseño del sitio, chequemos:
+
+```
+http://localhost/TestModel3/public/Index/index/
+```
+
+Muy bien, ahora queremos que esto realizado se aplique a todas las vistas de nuestro sitio, obviamente seria muy incomodo pasar esto a todas las vistas y aqui es donde entran los layouts, vamos a tomar de nuestro archivo index.php todo lo que aplica al sitio web(o a una parte especifica del sitio, sin embargo en este ejemplo un solo layout basta para todo el sitio), sacaremos el codigo que sera general y solo dejaremos lo que se encuentra dentro del <div> lo demas lo incliremos en un nuevo archivo que llamaremos Template.php y la ruta de este sera:<br>
+<br>
+<pre><code>application/View/Layouts/Template.php<br>
+</code></pre>
+
+Dentro de este archivo en la parte que va dentro del container agregaremos el siguiente bloque de codigo para indicar que ahi va lo que resulte de los archivos de vista:<br>
+<br>
+<pre><code>&lt;?php<br>
+echo $layoutdata;<br>
+?&gt;<br>
+</code></pre>
+
+El codigo final de Template.php seria este:<br>
+<br>
+<pre><code>&lt;?php /* @var $view Model3_View */ ?&gt;<br>
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;<br>
+&lt;html xmlns="http://www.w3.org/1999/xhtml" lang="es-ES"&gt;<br>
+    &lt;head&gt;<br>
+        &lt;title&gt;Model3&lt;/title&gt;<br>
+        &lt;?php<br>
+        $view-&gt;getCssManager()-&gt;loadCssFile('blueprint/screen.css', 'screen, projection');<br>
+        $view-&gt;getCssManager()-&gt;loadCssFile('blueprint/print.css', 'print');<br>
+        $view-&gt;getCssManager()-&gt;loadCssFile('blueprint/ie.css', 'screen', false, 'lt IE 8');<br>
+        ?&gt;<br>
+    &lt;/head&gt;<br>
+    &lt;body&gt;<br>
+        &lt;div class="container"&gt;<br>
+            &lt;?php<br>
+            echo $layoutdata;<br>
+            ?&gt;<br>
+        &lt;/div&gt;<br>
+    &lt;/body&gt;<br>
+&lt;/html&gt;<br>
+</code></pre>
+
+Y el de index.php seria este:<br>
+<br>
+<pre><code>&lt;?php /* @var $view Model3_View */ ?&gt;<br>
+&lt;h1&gt;Mis ebooks&lt;/h1&gt;<br>
+&lt;a href="&lt;?php echo $view-&gt;url(array('controller' =&gt; 'Index', 'action' =&gt; 'add')); ?&gt;"&gt;Agregar un nuevo libro&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;<br>
+&lt;table&gt;<br>
+    &lt;tr&gt;<br>
+        &lt;th&gt;Libro&lt;/th&gt;<br>
+        &lt;th&gt;Autor&lt;/th&gt;<br>
+        &lt;th&gt;Editar&lt;/th&gt;<br>
+        &lt;th&gt;Eliminar&lt;/th&gt;<br>
+    &lt;/tr&gt;<br>
+    &lt;?php<br>
+    foreach ($view-&gt;books as $book)<br>
+    {<br>
+        echo '&lt;tr&gt;';<br>
+        echo '&lt;td&gt;';<br>
+        echo $book-&gt;book;<br>
+        echo '&lt;/td&gt;';<br>
+        echo '&lt;td&gt;';<br>
+        echo $book-&gt;author;<br>
+        echo '&lt;/td&gt;';<br>
+        echo '&lt;td&gt;';<br>
+        echo '&lt;a href="' . $view-&gt;url(array('controller' =&gt; 'Index', 'action' =&gt; 'edit', 'book' =&gt; $book-&gt;id)) . '"&gt;Editar&lt;/a&gt;';<br>
+        echo '&lt;/td&gt;';<br>
+        echo '&lt;td&gt;';<br>
+        echo '&lt;a href="' . $view-&gt;url(array('controller' =&gt; 'Index', 'action' =&gt; 'delete', 'book' =&gt; $book-&gt;id)) . '"&gt;Eliminar&lt;/a&gt;';<br>
+        echo '&lt;/td&gt;';<br>
+        echo '&lt;/tr&gt;';<br>
+    }<br>
+    ?&gt;<br>
+&lt;/table&gt;<br>
+</code></pre>
+
+Ok, hasta aqui todo bien pero aun no termina el asunto, ahora tenemos que especificar a las vistas que deben usar el layout Template.php, podemos usar el metodo Model3_View::setTemplate() o podriamos modificar el archivo config.ini para indicar que todos lo deben usar(a menos que explicitamente se indique lo contrario), usaremos el segundo metodo agregando la linea layout al bloque General e indicando el nobre del archivo sin el .php, en el archivo se veria algo asi:<br>
+<br>
+<pre><code>[general]<br>
+layout = Template<br>
+debug = TRUE<br>
+error_controller = NotFound<br>
+error_action = index<br>
+</code></pre>
+
+Si ustedes prueban ahora su sitio web deberia seguir funcionando correctamente.<br>
+<br>
+Ahora lo que haremos sera quitar de todas las demas vistas el codigo html que ahora sobra, solo dejaremos lo que debe ir dentro del container, si revisan la aplicacion despues veran que blueprint esta integrado en todo el sitio web.<br>
+<br>
+Ahora pasaremos con JQuery, nosotros queremos darle un poco de funcionalidad js a todo nuestro sitio, es por esto que ahoremos lo mismo que con blueprint y agregaremos el jquery en nuestro layout para que este incluido en todo el sitio, agregaremos la sigiente linea de codigo enseguida de donde agregamos blueprint:<br>
+<br>
+<pre><code>$view-&gt;getJsManager()-&gt;loadJsFile('jquery/jquery-1.4.4.min.js');<br>
+</code></pre>
+
+En caso esto segun la version de JQuery que descargue y el lugar donde lo guarde, ajustenlo a su proyecto.<br>
+<br>
+Ahora a incluir codigo js, por ejemplo, comenzaremos agregando una confirmación antes de eliminar un libro, queremos agregar este codigo solamente dentro de la vista index del Controlador Index, no queremos que este codigo exista en todas las paginas, es por esto que el metodo que usamos para agregar JQuery no es util en esta ocasión para una situación de este tipo lo que tenemos que hacer es, agregar el codigo js en un archivo separado agregarlo desde la accion usando el metodo Model3_JsManager::addJs y despues incluirlos en el layout usando Model3_JsManager::loadJs de esta forma solo cargaremos los archivos indicados en la accion indicada, en este caso usaremos pequeño script en JQuery que detendra el link, confirmara y en caso de aceptar permitira la accion deseada, para esto crearemos un archivo js que en mi caso y con la idea de mantener orden en mi sitio, agregare en esta ruta:<br>
+<br>
+<pre><code>/scripts/js/application/Index/index.js<br>
+</code></pre>
+
+Y contendra algo tan sencillo como esto(que tampoco explicare porque es JQuery):<br>
+<br>
+<pre><code>$(document).ready(function() {<br>
+    $('.confirm-link').click(function(e) {<br>
+<br>
+        e.preventDefault();<br>
+        target = $(this).attr('href');<br>
+<br>
+        if(confirm('Estas seguro?')) {<br>
+            window.location = target;<br>
+        }<br>
+<br>
+    });<br>
+});<br>
+</code></pre>
+
+Ahora lo agregaremos al sitio, en el metodo indexAction de IndexController incluiremos la siguiente linea:<br>
+<br>
+<pre><code>$this-&gt;view-&gt;getJsManager()-&gt;addJs('application/Index/index.js');<br>
+</code></pre>
+
+Y en nuestro layout despues de agregar JQuery agregaremos esto:<br>
+<br>
+<pre><code>$view-&gt;getJsManager()-&gt;loadJs();<br>
+</code></pre>
+
+Ahora para que este pequeño script funcione, a los links que queramos confirmar debemos darles la clase "confirm-link", esto cambiaria la linea de nuestro script de vista en la cual se imprime el link de borrado:<br>
+<br>
+<pre><code>echo '&lt;a class="confirm-link" href="' . $view-&gt;url(array('controller' =&gt; 'Index', 'action' =&gt; 'delete', 'book' =&gt; $book-&gt;id)) . '"&gt;Eliminar&lt;/a&gt;';<br>
+</code></pre>
+
+Y con esto ya podemos probar nuestra applicacion, en el momento en que demos click sobre el link Borrar de algun libro de la lista primero nos preguntara si estamos seguros, y en caso de confirmar procedera a la eliminacion, de este mod es como podriamos agregar funcionalidad diferente a cada pagina sin estar cargando codigo JS o CSS que no sea necesario.<br>
+<br>
+Solo un tip mas, en algunos casos nosotros intentamos inicializar variables desde PHP, es decir inicializamos una variable JS mediante una variable PHP y despues la usamos en nuestro script js, bueno, pues esto es posible mediante el uso de Model3_JsManager::addJsVar y al momento de<br>
+llamar Model3_JsManager::loadJs tambien estas variables seran declaradas.<br>
+<br>
+Pues eso es todo por el momento, gracias por su tiempo y esperamos sus comentarios, saludos.
